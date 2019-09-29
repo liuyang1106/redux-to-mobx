@@ -4,10 +4,9 @@ import { Provider } from 'mobx-react'
 import * as store from './store'
 import Login from './router/login'
 
-
 function RouterConfig() {
   return (
-    <Provider store={store}>
+    <Provider {...store}>
       <BrowserRouter>
         <Switch>
           <Route path="/" exact component={Login} />
