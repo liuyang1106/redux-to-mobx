@@ -1,11 +1,8 @@
 import { observable, action, runInAction } from 'mobx'
 
-class Login {
+class Home {
   @observable
-  name = 'hello world'
-
-  @observable
-  age = 0
+  name = 'mobx'
 
   // 获得了整个顶层数据的能力
   @action
@@ -20,8 +17,8 @@ class Login {
   asyncTest = async ({ payload }, { store }) => {
     const promise = new Promise(( res, rej) => {
       setTimeout(()=> {
-        const { age } = payload
-        this.age = age
+        const { name } = payload
+        this.name = name
         res(payload)
       },500)
     })
@@ -29,4 +26,4 @@ class Login {
   }
 }
 
-export default new Login()
+export default new Home()

@@ -1,6 +1,7 @@
 import loginStore from './login'
+import homeStore from './home'
 
 export default {
-  nameSpace: true,
-  loginStore
+  loginStore,
+  homeStore
 }

@@ -1,19 +1,19 @@
 const isObject = obj => typeof obj === 'object' && obj !== null
 
+const throwError = str => { throw new Error(str) }
+
 /**
  * store 类，用于构建store
- * 1.外部接口 dispatch，destroy
+ * 1.外部接口 dispatch
  * 2.内部使用的接口 $$init，$$use
  */
 class Store {
   constructor(options = {}, plugins = {} ){
-    const { nameSpace: _nameSpace, ...rest } = options
+    const { ...rest } = options
     this.$$options = rest
-    this._nameSpace = _nameSpace  === undefined ?  true : _nameSpace
 
     // 获取所有的store的key，内部使用
     this.$$storeKey = Object.keys(rest)
-    Object.freeze(this.$$storeKey)
 
     // 当前所有的状态的数据
     this._state = {}
@@ -35,63 +35,50 @@ class Store {
 
   // 需要使用的插件
   // 插件可以拥有的能力
-  // 插件可以获得当前实例和实例所有的state
+  // 插件可以获得实例所有的state和dispatch方法
   $$use(plugins){
     if(isObject(plugins)){
       Object.keys(plugins).forEach(pluginsKey => {
         if(!plugins[pluginsKey].init && typeof plugins[pluginsKey].init !== 'function'){
-          throw new Error('插件注册失败。注册插件需要传入一个init方法')
+          throwError('插件注册失败。注册插件需要传入一个init方法')
         }
-        plugins[pluginsKey].init(this._state,this)
+        plugins[pluginsKey].init({ state: this._state, dispatch: this.dispatch })
       })
     }else{
-      throw new Error('插件注册失败。注册插件需要传入一个对象')
+      throwError('插件注册失败。注册插件需要传入一个对象')
     }
   }
 
-  // 发起action
+  // 这个dispatch方法用来做精确分发action
   dispatch(){
     const length = arguments.length
     if(length < 1){
-      throw new Error(`dispatch 必须要传入参数type`)
+      throwError(`dispatch 必须要传入参数type`)
     }
-    if(length == 1){
+    if(length === 1){
       if(isObject(arguments[0])){
         const { type, ...rest } = arguments[0]
         if(!type){
-          throw new Error(`dispatch 必须要传入参数type`)
+          throwError(`dispatch 必须要传入参数type`)
         }
-        if(this._nameSpace){
-          const [storeKey,functionName] = type.split('/')
-          if(!this.$$storeKey.includes(storeKey)){
-            throw new Error(`${storeKey}.${functionName} is not a function!`)
-          }else{
-            this[storeKey][functionName](rest)
-          }
-        }else{
-          // 没有开启nameSpace的时候如何调用，此时发起的action为全局的action
-        }
+        const [storeKey,functionName] = type.split('/')
+        // 返回这个action，可以做异步链式调用
+        return this[storeKey][functionName](rest, { store: this._state } )
       }
+      throwError(`dispatch 必须传入一个对象 `)
     }else{
       const [type, payload = {}] = arguments
       if(!type){
-        throw new Error(`dispatch 必须要传入参数type`)
+        throwError(`dispatch 必须要传入参数type`)
       }
-      if(this._nameSpace){
-        const [storeKey,functionName] = type.split('/')
-        if(!this.$$storeKey.includes(storeKey)){
-          throw new Error(`${storeKey}.${functionName} is not a function!`)
-        }else{
-          this[storeKey][functionName]({ payload })
-        }
-      }else{
-        // 没有开启nameSpace的时候如何调用，此时发起的action为全局的action
+      if(!isObject(payload)) {
+        throwError(`dispatch 必须传入一个对象 `)
       }
+      const [storeKey,functionName] = type.split('/')
+      // 返回这个action，可以做异步链式调用
+      return this[storeKey][functionName]({ payload },{ store: this._state })
     }
   }
-
-  // 清空store
-  destroy(){}
 }
 
 export default Store
