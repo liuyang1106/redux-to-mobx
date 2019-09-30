@@ -1,68 +1,34 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 项目描述
 
-## Available Scripts
+项目为 mobx 作为数据管理的项目。在使用了大量的 redux 之后，尝试在项目中使用 mobx 作为数据管理层。但是在使用 mobx 做开发的时候遇到了以下问题：
 
-In the project directory, you can run:
+1. 当一个组件注入了多个 store 的时候比较难管理，发起不同的 action 需要 store1.fn(),store2.fn()去分发
+2. store1 和 store2 是完全隔离的，在 store1 内部完全无法获取 store2 的数据（部分场景需要），这造成了数据内部交流障碍
+3. 想要在全局顶层提供一个 store，以增强逻辑组件之间的联系
+4. 纯 UI 组件需要派发多个 action 的时候困难
 
-### `npm start`
+### 为什么要做这个 demo
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. 这个 demo 是为了熟悉 redux 的同学快速迁移到 mobx 开发，几乎无成本
+2. 使用 mobx 作为状态管理的时候想要做一个模版在以后的项目中使用
+3. 需要使用 mobx 中的架构问题（上面的问题）
+4. 发现 vue + vuex = react + mobx，但是 vuex 很好用，想实现一个简单的 vuex 在 react + mobx 这种数据流中使用
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+### 这个项目解决了的问题
 
-### `npm test`
+1. 提供了一个顶层 store 解决了各个逻辑组件的通信问题
+2. 提供了 dispatch 方法派发 action 提升 UI 组件派发 action 能力
+3. action 函数获得了整个 store 的顶层状态
+4. 发挥 mobx 的精确更新的优势(autorun)，效率很高，无需 reselect 和 immutable（抛弃了 redux 哪一套带来的性能问题）。mobx 自始至终都只有一份数据
+5. 实现了类似 redux 的 connect 方法的高阶组件，可以增加想要增强的类并且简化 store 的使用
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 项目启动
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+```bash
+# windows 用户
+npm install
+npm start
+# macOS
+npm install || yarn install
+npm start || yarn start
+```
